@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
 // Interceptor para agregar token JWT si existe
@@ -20,6 +20,7 @@ export const examService = {
   getMyExams: () => api.get('/exams'),
   getExamById: (id) => api.get(`/exams/${id}`),
   generateExam: (data) => api.post('/exams/generate', data),
+  deleteExam: (id) => api.delete(`/exams/${id}`),
   submitExam: (id, answers) => api.put(`/exams/${id}/submit`, { answers }),
   getRecommendations: () => api.get('/exams/recommendations'),
   chatWithTutor: (history, message) => api.post('/exams/chat', { history, message }),

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: icfes-smart-study-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: APPSCRIPT_WEBHOOK_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

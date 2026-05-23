@@ -12,6 +12,7 @@ const ExamRunner = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
@@ -63,17 +64,21 @@ const ExamRunner = () => {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting || isSubmitted) return; // Protección anti doble envío
     if (Object.keys(answers).length < exam.questions.length) {
       alert('Por favor responde todas las preguntas');
       return;
     }
     
+    setIsSubmitting(true);
     try {
       const response = await examService.submitExam(id, Object.values(answers));
       setExam(response.data);
       setIsSubmitted(true);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -229,9 +234,14 @@ const ExamRunner = () => {
         {!isSubmitted && currentQuestion === exam.questions.length - 1 ? (
           <button
             onClick={handleSubmit}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-2.5 rounded-lg font-bold transition-colors shadow-sm"
+            disabled={isSubmitting}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white px-8 py-2.5 rounded-lg font-bold transition-colors shadow-sm"
           >
-            Finalizar Simulacro <CheckCircle2 className="h-5 w-5" />
+            {isSubmitting ? (
+              <><Loader2 className="h-5 w-5 animate-spin" /> Guardando...</>
+            ) : (
+              <>Finalizar Simulacro <CheckCircle2 className="h-5 w-5" /></>
+            )}
           </button>
         ) : (
           <button

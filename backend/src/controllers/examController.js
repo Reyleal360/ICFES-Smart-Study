@@ -44,6 +44,24 @@ export const getExamById = async (req, res) => {
   }
 };
 
+// @desc    Eliminar simulacro por ID
+// @route   DELETE /api/exams/:id
+// @access  Private
+export const deleteExam = async (req, res) => {
+  try {
+    const exam = await MockExam.findById(req.params.id);
+
+    if (exam && exam.user.toString() === req.user._id.toString()) {
+      await MockExam.deleteOne({ _id: exam._id });
+      res.json({ message: 'Simulacro eliminado' });
+    } else {
+      res.status(404).json({ message: 'Simulacro no encontrado o no autorizado' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Guardar resultados del simulacro
 // @route   PUT /api/exams/:id/submit
 // @access  Private

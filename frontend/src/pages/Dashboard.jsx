@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, Award, Brain, Clock, ChevronRight, Lightbulb, Target } from 'lucide-react';
+import { PlayCircle, Award, Brain, Clock, ChevronRight, Lightbulb, Target, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { examService } from '../services/api';
 
@@ -10,23 +10,37 @@ const Dashboard = () => {
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchData = async () => {
+    try {
+      const [examsRes, recsRes] = await Promise.all([
+        examService.getMyExams(),
+        examService.getRecommendations()
+      ]);
+      setExams(examsRes.data);
+      setRecommendations(recsRes.data);
+    } catch (error) {
+      console.error("Error al cargar datos del dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [examsRes, recsRes] = await Promise.all([
-          examService.getMyExams(),
-          examService.getRecommendations()
-        ]);
-        setExams(examsRes.data);
-        setRecommendations(recsRes.data);
-      } catch (error) {
-        console.error("Error al cargar datos del dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); // Evitar que navegue al examen
+    if (window.confirm('¿Estás seguro de que deseas eliminar este simulacro? Esta acción no se puede deshacer y afectará tu promedio.')) {
+      try {
+        await examService.deleteExam(id);
+        fetchData(); // Recargar datos
+      } catch (error) {
+        console.error("Error al eliminar el simulacro:", error);
+        alert("No se pudo eliminar el simulacro.");
+      }
+    }
+  };
 
   const completedExams = exams.filter(e => e.isCompleted);
   const avgScore = completedExams.length > 0 
@@ -159,6 +173,13 @@ const Dashboard = () => {
                       <p className="font-bold text-primary-600 text-lg">{exam.score}/500</p>
                     </div>
                   )}
+                  <button 
+                    onClick={(e) => handleDelete(e, exam._id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar simulacro"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                   <ChevronRight className="h-5 w-5 text-gray-400" />
                 </div>
               </div>

@@ -6,9 +6,13 @@ const generateQuestions = async (subject, topics, difficulty, count) => {
     baseURL: "https://api.groq.com/openai/v1",
   });
 
+  const isEnglish = subject.toLowerCase().includes('inglés') || subject.toLowerCase().includes('ingles');
+  
   const prompt = `Actúa como un experto evaluador del ICFES en Colombia.
 Tu tarea es generar ${count} preguntas de opción múltiple sobre la materia "${subject}", enfocándote en los siguientes temas: "${topics}".
 La dificultad debe ser "${difficulty}".
+
+${isEnglish ? "MUY IMPORTANTE: Como la materia es Inglés, el 'question' (texto de la pregunta) y las 'options' (opciones de respuesta) DEBEN ESTAR COMPLETAMENTE EN INGLÉS. La 'justification' (justificación) debe estar en Español para que el estudiante entienda la explicación." : "Las preguntas y opciones deben estar en Español."}
 
 Debes devolver EXACTAMENTE un JSON con la siguiente estructura, sin texto adicional antes o después:
 [
@@ -19,7 +23,8 @@ Debes devolver EXACTAMENTE un JSON con la siguiente estructura, sin texto adicio
     "justification": "Explicación detallada de por qué esta es la respuesta correcta y por qué las demás no lo son, basada en competencias ICFES."
   }
 ]
-Asegúrate de que las preguntas evalúen competencias y pensamiento crítico, al estilo real del ICFES.`;
+Asegúrate de que las preguntas evalúen competencias y pensamiento crítico, al estilo real del ICFES.
+MUY IMPORTANTE: El resultado debe ser un JSON válido. Si usas ecuaciones matemáticas o LaTeX, DEBES escapar las barras invertidas (ejemplo: usa "\\\\frac" en lugar de "\\frac", o usa texto plano como "1/2"). No incluyas saltos de línea sin escapar dentro de los textos.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -84,9 +89,15 @@ Devuelve EXACTAMENTE este JSON:
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
-    return JSON.parse(response.choices[0].message.content);
+    let resultText = response.choices[0].message.content;
+    const startIndex = resultText.indexOf('{');
+    const endIndex = resultText.lastIndexOf('}');
+    if (startIndex !== -1 && endIndex !== -1) {
+      resultText = resultText.substring(startIndex, endIndex + 1);
+    }
+    return JSON.parse(resultText);
   } catch (error) {
-    console.error("Error generating recommendations:", error);
+    console.error("Error generating recommendations:", error.message);
     return {
       message: "Sigue practicando realizando más simulacros para que la IA pueda darte recomendaciones precisas.",
       topicsToReview: ["Lectura Crítica general", "Matemáticas básicas", "Ciencias"]
