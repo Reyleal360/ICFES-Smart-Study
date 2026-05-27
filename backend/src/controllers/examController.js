@@ -85,22 +85,7 @@ export const submitExam = async (req, res) => {
       exam.isCompleted = true;
       const updatedExam = await exam.save();
 
-      // Llamar al webhook de n8n para notificar el resultado (automatización Low Code)
-      try {
-        const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
-        if (N8N_WEBHOOK_URL) {
-          await axios.post(N8N_WEBHOOK_URL, {
-            userId: req.user._id,
-            userName: req.user.name,
-            userEmail: req.user.email,
-            examSubject: exam.subject,
-            score: score
-          });
-          console.log("Webhook de n8n enviado correctamente.");
-        }
-      } catch (webhookError) {
-        console.error("Error enviando webhook a n8n:", webhookError.message);
-      }
+
 
       // Enviar datos a Google Sheets vía Google Apps Script (Low Code - AppSheet)
       try {
