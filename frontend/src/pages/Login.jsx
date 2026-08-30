@@ -13,17 +13,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    let success;
+    let result;
     if (isLogin) {
-      success = await login(formData.email, formData.password);
+      result = await login(formData.email, formData.password);
     } else {
-      success = await register(formData.name, formData.email, formData.password);
+      result = await register(formData.name, formData.email, formData.password);
     }
 
-    if (success) {
+    if (result?.success) {
       navigate('/');
     } else {
-      setError('Credenciales inválidas o error en el servidor');
+      setError(result?.message || 'Credenciales inválidas o error en el servidor');
     }
   };
 

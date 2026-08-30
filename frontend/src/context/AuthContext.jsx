@@ -23,10 +23,13 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      return true;
+      return { success: true };
     } catch (error) {
       console.error(error);
-      return false;
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Error al conectar con el servidor' 
+      };
     }
   };
 
@@ -36,10 +39,13 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      return true;
+      return { success: true };
     } catch (error) {
       console.error(error);
-      return false;
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Error al conectar con el servidor' 
+      };
     }
   };
 

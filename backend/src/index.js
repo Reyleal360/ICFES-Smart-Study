@@ -12,16 +12,12 @@ dotenv.config();
 const app = express();
 
 // Configuración de middlewares
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.FRONTEND_URL, // URL de Vercel en producción
-].filter(Boolean);
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());
+
 
 // Conexión a base de datos
 connectDB();
