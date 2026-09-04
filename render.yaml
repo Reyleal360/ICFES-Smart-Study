@@ -22,8 +22,9 @@ services:
         sync: false
 
   # Frontend Web App (React / Vite)
-  - type: static
+  - type: web
     name: icfes-smart-study-web
+    runtime: static
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
