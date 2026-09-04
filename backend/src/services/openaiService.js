@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 
+const AI_MODEL = process.env.AI_MODEL || "qwen/qwen3.8-27b";
+
 const generateQuestions = async (subject, topics, difficulty, count) => {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -28,7 +30,7 @@ MUY IMPORTANTE: El resultado debe ser un JSON vÃ¡lido. Si usas ecuaciones matemÃ
 
   try {
     const response = await openai.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: AI_MODEL,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -85,7 +87,7 @@ Devuelve EXACTAMENTE este JSON:
 
   try {
     const response = await openai.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: AI_MODEL,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -121,7 +123,7 @@ const getChatResponse = async (history, currentMessage) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: AI_MODEL,
       messages: messages,
       temperature: 0.7,
     });
